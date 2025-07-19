@@ -4,9 +4,17 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "prettier": "3.6.2"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.13.4",
+    "grpc": "^1.24.11",
+    "mineflayer": "^4.30.0",
+    "pino": "^9.7.0",
+    "ts-proto": "^2.7.5"
   }
 }
