@@ -1,17 +1,16 @@
-FROM oven/bun:debian AS build
+FROM oven/bun:alpine AS build
 
 WORKDIR /app
 
-COPY src .
+COPY src ./src
 COPY package.json .
 COPY tsconfig.json .
 COPY bun.lock .
 
-RUN apt-get update
-RUN apt-get install -y ffmpeg python3 make g++
+RUN apk add --no-cache ffmpeg
 
 RUN ["bun", "install"]
-RUN ["bun", "build", "src/index.ts", "--outdir", "dist"]
+RUN ["bun", "build", "src/index.ts", "--outdir", "dist", "--target", "bun"]
 
 FROM oven/bun:alpine
 
