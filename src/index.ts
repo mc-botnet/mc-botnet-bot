@@ -1,10 +1,6 @@
 import pino from "pino";
 import { createChannel, createClient } from "nice-grpc";
-import {
-    type AcceptorClient,
-    AcceptorDefinition,
-    ReadyRequest,
-} from "./rpc/pb/bot.ts";
+import { type AcceptorClient, AcceptorDefinition } from "./rpc/pb/bot.ts";
 
 async function main() {
     const log = pino();
@@ -22,12 +18,19 @@ async function main() {
     };
 
     const channel = createChannel(`${config.grpcHost}:${config.grpcPort}`);
+    log.info("Connected to gRPC channel");
 
     const acceptorClient: AcceptorClient = createClient(
         AcceptorDefinition,
         channel,
     );
+
     await acceptorClient.ready({ id: config.botId });
+    log.info("Sent Ready request");
+
+    setInterval(() => {
+        log.info("bump");
+    }, 10000);
 }
 
 await main();
