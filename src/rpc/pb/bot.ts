@@ -6,6 +6,7 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import type { CallContext, CallOptions } from "nice-grpc-common";
 import { Empty } from "./google/protobuf/empty";
 
 export const protobufPackage = "";
@@ -66,10 +67,10 @@ export const ReadyRequest: MessageFns<ReadyRequest> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ReadyRequest>, I>>(base?: I): ReadyRequest {
-    return ReadyRequest.fromPartial(base ?? ({} as any));
+  create(base?: DeepPartial<ReadyRequest>): ReadyRequest {
+    return ReadyRequest.fromPartial(base ?? {});
   },
-  fromPartial<I extends Exact<DeepPartial<ReadyRequest>, I>>(object: I): ReadyRequest {
+  fromPartial(object: DeepPartial<ReadyRequest>): ReadyRequest {
     const message = createBaseReadyRequest();
     message.id = object.id ?? "";
     return message;
@@ -124,58 +125,62 @@ export const PingResponse: MessageFns<PingResponse> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<PingResponse>, I>>(base?: I): PingResponse {
-    return PingResponse.fromPartial(base ?? ({} as any));
+  create(base?: DeepPartial<PingResponse>): PingResponse {
+    return PingResponse.fromPartial(base ?? {});
   },
-  fromPartial<I extends Exact<DeepPartial<PingResponse>, I>>(object: I): PingResponse {
+  fromPartial(object: DeepPartial<PingResponse>): PingResponse {
     const message = createBasePingResponse();
     message.payload = object.payload ?? "";
     return message;
   },
 };
 
-export interface Acceptor {
-  Ready(request: ReadyRequest): Promise<Empty>;
+export type AcceptorDefinition = typeof AcceptorDefinition;
+export const AcceptorDefinition = {
+  name: "Acceptor",
+  fullName: "Acceptor",
+  methods: {
+    ready: {
+      name: "Ready",
+      requestType: ReadyRequest,
+      requestStream: false,
+      responseType: Empty,
+      responseStream: false,
+      options: {},
+    },
+  },
+} as const;
+
+export interface AcceptorServiceImplementation<CallContextExt = {}> {
+  ready(request: ReadyRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
 }
 
-export const AcceptorServiceName = "Acceptor";
-export class AcceptorClientImpl implements Acceptor {
-  private readonly rpc: Rpc;
-  private readonly service: string;
-  constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || AcceptorServiceName;
-    this.rpc = rpc;
-    this.Ready = this.Ready.bind(this);
-  }
-  Ready(request: ReadyRequest): Promise<Empty> {
-    const data = ReadyRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "Ready", data);
-    return promise.then((data) => Empty.decode(new BinaryReader(data)));
-  }
+export interface AcceptorClient<CallOptionsExt = {}> {
+  ready(request: DeepPartial<ReadyRequest>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
 }
 
-export interface Bot {
-  Ping(request: Empty): Promise<PingResponse>;
+export type BotDefinition = typeof BotDefinition;
+export const BotDefinition = {
+  name: "Bot",
+  fullName: "Bot",
+  methods: {
+    ping: {
+      name: "Ping",
+      requestType: Empty,
+      requestStream: false,
+      responseType: PingResponse,
+      responseStream: false,
+      options: {},
+    },
+  },
+} as const;
+
+export interface BotServiceImplementation<CallContextExt = {}> {
+  ping(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<PingResponse>>;
 }
 
-export const BotServiceName = "Bot";
-export class BotClientImpl implements Bot {
-  private readonly rpc: Rpc;
-  private readonly service: string;
-  constructor(rpc: Rpc, opts?: { service?: string }) {
-    this.service = opts?.service || BotServiceName;
-    this.rpc = rpc;
-    this.Ping = this.Ping.bind(this);
-  }
-  Ping(request: Empty): Promise<PingResponse> {
-    const data = Empty.encode(request).finish();
-    const promise = this.rpc.request(this.service, "Ping", data);
-    return promise.then((data) => PingResponse.decode(new BinaryReader(data)));
-  }
-}
-
-interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
+export interface BotClient<CallOptionsExt = {}> {
+  ping(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<PingResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
@@ -186,10 +191,6 @@ export type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
-
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
@@ -199,6 +200,6 @@ export interface MessageFns<T> {
   decode(input: BinaryReader | Uint8Array, length?: number): T;
   fromJSON(object: any): T;
   toJSON(message: T): unknown;
-  create<I extends Exact<DeepPartial<T>, I>>(base?: I): T;
-  fromPartial<I extends Exact<DeepPartial<T>, I>>(object: I): T;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }
