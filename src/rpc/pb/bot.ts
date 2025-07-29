@@ -13,6 +13,7 @@ export const protobufPackage = "";
 
 export interface ReadyRequest {
   id: string;
+  port: number;
 }
 
 export interface PingResponse {
@@ -20,13 +21,16 @@ export interface PingResponse {
 }
 
 function createBaseReadyRequest(): ReadyRequest {
-  return { id: "" };
+  return { id: "", port: 0 };
 }
 
 export const ReadyRequest: MessageFns<ReadyRequest> = {
   encode(message: ReadyRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
+    }
+    if (message.port !== 0) {
+      writer.uint32(16).int32(message.port);
     }
     return writer;
   },
@@ -46,6 +50,14 @@ export const ReadyRequest: MessageFns<ReadyRequest> = {
           message.id = reader.string();
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.port = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -56,13 +68,19 @@ export const ReadyRequest: MessageFns<ReadyRequest> = {
   },
 
   fromJSON(object: any): ReadyRequest {
-    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      port: isSet(object.port) ? globalThis.Number(object.port) : 0,
+    };
   },
 
   toJSON(message: ReadyRequest): unknown {
     const obj: any = {};
     if (message.id !== "") {
       obj.id = message.id;
+    }
+    if (message.port !== 0) {
+      obj.port = Math.round(message.port);
     }
     return obj;
   },
@@ -73,6 +91,7 @@ export const ReadyRequest: MessageFns<ReadyRequest> = {
   fromPartial(object: DeepPartial<ReadyRequest>): ReadyRequest {
     const message = createBaseReadyRequest();
     message.id = object.id ?? "";
+    message.port = object.port ?? 0;
     return message;
   },
 };
