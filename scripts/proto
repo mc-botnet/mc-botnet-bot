@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-cd src/rpc/pb
-protoc --plugin=../../../node_modules/.bin/protoc-gen-ts_proto \
+cd src/pb
+protoc --plugin=../../node_modules/.bin/protoc-gen-ts_proto \
   --ts_proto_out=. \
   --ts_proto_opt=outputServices=nice-grpc,outputServices=generic-definitions,useExactTypes=false \
   bot.proto
