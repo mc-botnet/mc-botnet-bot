@@ -1,5 +1,5 @@
 import type { CallContext, ServiceImplementation } from "nice-grpc";
-import type { DeepPartial, PingResponse, BotDefinition, Event } from "./pb/bot.ts";
+import type { DeepPartial, PingResponse, BotDefinition, Event, ConnectRequest } from "./pb/bot.ts";
 import type { Empty } from "./pb/google/protobuf/empty.ts";
 
 export class Rpc implements ServiceImplementation<BotDefinition> {
@@ -8,4 +8,8 @@ export class Rpc implements ServiceImplementation<BotDefinition> {
     }
 
     async *streamEvents(_request: Empty, _context: CallContext): AsyncIterable<DeepPartial<Event>> {}
+
+    async connect(request: ConnectRequest, context: CallContext): Promise<Empty> {
+        return {};
+    }
 }

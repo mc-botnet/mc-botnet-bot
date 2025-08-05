@@ -7,1072 +7,1276 @@
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import type { CallContext, CallOptions } from "nice-grpc-common";
-import { Empty } from "./google/protobuf/empty.ts";
+import { Empty } from "./google/protobuf/empty";
 
 export const protobufPackage = "";
 
 export interface ReadyRequest {
-    id: string;
-    port: number;
+  id: string;
+  port: number;
 }
 
 export interface PingResponse {
-    payload: string;
+  payload: string;
+}
+
+export interface ConnectRequest {
+  host: string;
+  port: number;
+  offlineUsername?: string | undefined;
+  onlineAccount?: OnlineAccount | undefined;
+}
+
+export interface OnlineAccount {
+  id: string;
+  username: string;
+  accessToken: string;
 }
 
 export interface ChatMessage {
-    json: string;
-    extra: ChatMessage[];
-    translate?: string | undefined;
+  json: string;
+  extra: ChatMessage[];
+  translate?: string | undefined;
 }
 
 export interface Error {
-    name: string;
-    message: string;
-    cause?: Error | undefined;
+  name: string;
+  message: string;
+  cause?: Error | undefined;
 }
 
 export interface Event {
-    chatEvent?: ChatEvent | undefined;
-    whisperEvent?: WhisperEvent | undefined;
-    actionBarEvent?: ActionBarEvent | undefined;
-    errorEvent?: ErrorEvent | undefined;
-    messageEvent?: MessageEvent | undefined;
+  chatEvent?: ChatEvent | undefined;
+  whisperEvent?: WhisperEvent | undefined;
+  actionBarEvent?: ActionBarEvent | undefined;
+  errorEvent?: ErrorEvent | undefined;
+  messageEvent?: MessageEvent | undefined;
 }
 
 export interface ChatEvent {
-    username: string;
-    message: string;
-    translate?: string | undefined;
-    jsonMsg: ChatMessage | undefined;
-    matches: string[];
+  username: string;
+  message: string;
+  translate?: string | undefined;
+  jsonMsg: ChatMessage | undefined;
+  matches: string[];
 }
 
 export interface WhisperEvent {
-    username: string;
-    message: string;
-    translate?: string | undefined;
-    jsonMsg: ChatMessage | undefined;
-    matches: string[];
+  username: string;
+  message: string;
+  translate?: string | undefined;
+  jsonMsg: ChatMessage | undefined;
+  matches: string[];
 }
 
 export interface ActionBarEvent {
-    jsonMsg: ChatMessage | undefined;
+  jsonMsg: ChatMessage | undefined;
 }
 
 export interface ErrorEvent {
-    err: Error | undefined;
+  err: Error | undefined;
 }
 
 export interface MessageEvent {
-    message: ChatMessage | undefined;
-    position: string;
+  message: ChatMessage | undefined;
+  position: string;
 }
 
 function createBaseReadyRequest(): ReadyRequest {
-    return { id: "", port: 0 };
+  return { id: "", port: 0 };
 }
 
 export const ReadyRequest: MessageFns<ReadyRequest> = {
-    encode(message: ReadyRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.id !== "") {
-            writer.uint32(10).string(message.id);
+  encode(message: ReadyRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.port !== 0) {
+      writer.uint32(16).int32(message.port);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ReadyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReadyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
         }
-        if (message.port !== 0) {
-            writer.uint32(16).int32(message.port);
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.port = reader.int32();
+          continue;
         }
-        return writer;
-    },
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): ReadyRequest {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseReadyRequest();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  fromJSON(object: any): ReadyRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      port: isSet(object.port) ? globalThis.Number(object.port) : 0,
+    };
+  },
 
-                    message.id = reader.string();
-                    continue;
-                }
-                case 2: {
-                    if (tag !== 16) {
-                        break;
-                    }
+  toJSON(message: ReadyRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.port !== 0) {
+      obj.port = Math.round(message.port);
+    }
+    return obj;
+  },
 
-                    message.port = reader.int32();
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
-        }
-        return message;
-    },
-
-    fromJSON(object: any): ReadyRequest {
-        return {
-            id: isSet(object.id) ? globalThis.String(object.id) : "",
-            port: isSet(object.port) ? globalThis.Number(object.port) : 0,
-        };
-    },
-
-    toJSON(message: ReadyRequest): unknown {
-        const obj: any = {};
-        if (message.id !== "") {
-            obj.id = message.id;
-        }
-        if (message.port !== 0) {
-            obj.port = Math.round(message.port);
-        }
-        return obj;
-    },
-
-    create(base?: DeepPartial<ReadyRequest>): ReadyRequest {
-        return ReadyRequest.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<ReadyRequest>): ReadyRequest {
-        const message = createBaseReadyRequest();
-        message.id = object.id ?? "";
-        message.port = object.port ?? 0;
-        return message;
-    },
+  create(base?: DeepPartial<ReadyRequest>): ReadyRequest {
+    return ReadyRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ReadyRequest>): ReadyRequest {
+    const message = createBaseReadyRequest();
+    message.id = object.id ?? "";
+    message.port = object.port ?? 0;
+    return message;
+  },
 };
 
 function createBasePingResponse(): PingResponse {
-    return { payload: "" };
+  return { payload: "" };
 }
 
 export const PingResponse: MessageFns<PingResponse> = {
-    encode(message: PingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.payload !== "") {
-            writer.uint32(10).string(message.payload);
+  encode(message: PingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.payload !== "") {
+      writer.uint32(10).string(message.payload);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.payload = reader.string();
+          continue;
         }
-        return writer;
-    },
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): PingResponse {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBasePingResponse();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  fromJSON(object: any): PingResponse {
+    return { payload: isSet(object.payload) ? globalThis.String(object.payload) : "" };
+  },
 
-                    message.payload = reader.string();
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
+  toJSON(message: PingResponse): unknown {
+    const obj: any = {};
+    if (message.payload !== "") {
+      obj.payload = message.payload;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PingResponse>): PingResponse {
+    return PingResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PingResponse>): PingResponse {
+    const message = createBasePingResponse();
+    message.payload = object.payload ?? "";
+    return message;
+  },
+};
+
+function createBaseConnectRequest(): ConnectRequest {
+  return { host: "", port: 0, offlineUsername: undefined, onlineAccount: undefined };
+}
+
+export const ConnectRequest: MessageFns<ConnectRequest> = {
+  encode(message: ConnectRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.host !== "") {
+      writer.uint32(10).string(message.host);
+    }
+    if (message.port !== 0) {
+      writer.uint32(16).int32(message.port);
+    }
+    if (message.offlineUsername !== undefined) {
+      writer.uint32(34).string(message.offlineUsername);
+    }
+    if (message.onlineAccount !== undefined) {
+      OnlineAccount.encode(message.onlineAccount, writer.uint32(42).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ConnectRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConnectRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.host = reader.string();
+          continue;
         }
-        return message;
-    },
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-    fromJSON(object: any): PingResponse {
-        return { payload: isSet(object.payload) ? globalThis.String(object.payload) : "" };
-    },
-
-    toJSON(message: PingResponse): unknown {
-        const obj: any = {};
-        if (message.payload !== "") {
-            obj.payload = message.payload;
+          message.port = reader.int32();
+          continue;
         }
-        return obj;
-    },
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-    create(base?: DeepPartial<PingResponse>): PingResponse {
-        return PingResponse.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<PingResponse>): PingResponse {
-        const message = createBasePingResponse();
-        message.payload = object.payload ?? "";
-        return message;
-    },
+          message.offlineUsername = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.onlineAccount = OnlineAccount.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ConnectRequest {
+    return {
+      host: isSet(object.host) ? globalThis.String(object.host) : "",
+      port: isSet(object.port) ? globalThis.Number(object.port) : 0,
+      offlineUsername: isSet(object.offlineUsername) ? globalThis.String(object.offlineUsername) : undefined,
+      onlineAccount: isSet(object.onlineAccount) ? OnlineAccount.fromJSON(object.onlineAccount) : undefined,
+    };
+  },
+
+  toJSON(message: ConnectRequest): unknown {
+    const obj: any = {};
+    if (message.host !== "") {
+      obj.host = message.host;
+    }
+    if (message.port !== 0) {
+      obj.port = Math.round(message.port);
+    }
+    if (message.offlineUsername !== undefined) {
+      obj.offlineUsername = message.offlineUsername;
+    }
+    if (message.onlineAccount !== undefined) {
+      obj.onlineAccount = OnlineAccount.toJSON(message.onlineAccount);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ConnectRequest>): ConnectRequest {
+    return ConnectRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ConnectRequest>): ConnectRequest {
+    const message = createBaseConnectRequest();
+    message.host = object.host ?? "";
+    message.port = object.port ?? 0;
+    message.offlineUsername = object.offlineUsername ?? undefined;
+    message.onlineAccount = (object.onlineAccount !== undefined && object.onlineAccount !== null)
+      ? OnlineAccount.fromPartial(object.onlineAccount)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseOnlineAccount(): OnlineAccount {
+  return { id: "", username: "", accessToken: "" };
+}
+
+export const OnlineAccount: MessageFns<OnlineAccount> = {
+  encode(message: OnlineAccount, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.username !== "") {
+      writer.uint32(18).string(message.username);
+    }
+    if (message.accessToken !== "") {
+      writer.uint32(26).string(message.accessToken);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): OnlineAccount {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseOnlineAccount();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.accessToken = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): OnlineAccount {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      accessToken: isSet(object.accessToken) ? globalThis.String(object.accessToken) : "",
+    };
+  },
+
+  toJSON(message: OnlineAccount): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.accessToken !== "") {
+      obj.accessToken = message.accessToken;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<OnlineAccount>): OnlineAccount {
+    return OnlineAccount.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<OnlineAccount>): OnlineAccount {
+    const message = createBaseOnlineAccount();
+    message.id = object.id ?? "";
+    message.username = object.username ?? "";
+    message.accessToken = object.accessToken ?? "";
+    return message;
+  },
 };
 
 function createBaseChatMessage(): ChatMessage {
-    return { json: "", extra: [], translate: undefined };
+  return { json: "", extra: [], translate: undefined };
 }
 
 export const ChatMessage: MessageFns<ChatMessage> = {
-    encode(message: ChatMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.json !== "") {
-            writer.uint32(10).string(message.json);
-        }
-        for (const v of message.extra) {
-            ChatMessage.encode(v!, writer.uint32(18).fork()).join();
-        }
-        if (message.translate !== undefined) {
-            writer.uint32(26).string(message.translate);
-        }
-        return writer;
-    },
+  encode(message: ChatMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.json !== "") {
+      writer.uint32(10).string(message.json);
+    }
+    for (const v of message.extra) {
+      ChatMessage.encode(v!, writer.uint32(18).fork()).join();
+    }
+    if (message.translate !== undefined) {
+      writer.uint32(26).string(message.translate);
+    }
+    return writer;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): ChatMessage {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseChatMessage();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatMessage {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatMessage();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-                    message.json = reader.string();
-                    continue;
-                }
-                case 2: {
-                    if (tag !== 18) {
-                        break;
-                    }
-
-                    message.extra.push(ChatMessage.decode(reader, reader.uint32()));
-                    continue;
-                }
-                case 3: {
-                    if (tag !== 26) {
-                        break;
-                    }
-
-                    message.translate = reader.string();
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
+          message.json = reader.string();
+          continue;
         }
-        return message;
-    },
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-    fromJSON(object: any): ChatMessage {
-        return {
-            json: isSet(object.json) ? globalThis.String(object.json) : "",
-            extra: globalThis.Array.isArray(object?.extra) ? object.extra.map((e: any) => ChatMessage.fromJSON(e)) : [],
-            translate: isSet(object.translate) ? globalThis.String(object.translate) : undefined,
-        };
-    },
+          message.extra.push(ChatMessage.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-    toJSON(message: ChatMessage): unknown {
-        const obj: any = {};
-        if (message.json !== "") {
-            obj.json = message.json;
+          message.translate = reader.string();
+          continue;
         }
-        if (message.extra?.length) {
-            obj.extra = message.extra.map((e) => ChatMessage.toJSON(e));
-        }
-        if (message.translate !== undefined) {
-            obj.translate = message.translate;
-        }
-        return obj;
-    },
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-    create(base?: DeepPartial<ChatMessage>): ChatMessage {
-        return ChatMessage.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<ChatMessage>): ChatMessage {
-        const message = createBaseChatMessage();
-        message.json = object.json ?? "";
-        message.extra = object.extra?.map((e) => ChatMessage.fromPartial(e)) || [];
-        message.translate = object.translate ?? undefined;
-        return message;
-    },
+  fromJSON(object: any): ChatMessage {
+    return {
+      json: isSet(object.json) ? globalThis.String(object.json) : "",
+      extra: globalThis.Array.isArray(object?.extra) ? object.extra.map((e: any) => ChatMessage.fromJSON(e)) : [],
+      translate: isSet(object.translate) ? globalThis.String(object.translate) : undefined,
+    };
+  },
+
+  toJSON(message: ChatMessage): unknown {
+    const obj: any = {};
+    if (message.json !== "") {
+      obj.json = message.json;
+    }
+    if (message.extra?.length) {
+      obj.extra = message.extra.map((e) => ChatMessage.toJSON(e));
+    }
+    if (message.translate !== undefined) {
+      obj.translate = message.translate;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ChatMessage>): ChatMessage {
+    return ChatMessage.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatMessage>): ChatMessage {
+    const message = createBaseChatMessage();
+    message.json = object.json ?? "";
+    message.extra = object.extra?.map((e) => ChatMessage.fromPartial(e)) || [];
+    message.translate = object.translate ?? undefined;
+    return message;
+  },
 };
 
 function createBaseError(): Error {
-    return { name: "", message: "", cause: undefined };
+  return { name: "", message: "", cause: undefined };
 }
 
 export const Error: MessageFns<Error> = {
-    encode(message: Error, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.name !== "") {
-            writer.uint32(10).string(message.name);
-        }
-        if (message.message !== "") {
-            writer.uint32(18).string(message.message);
-        }
-        if (message.cause !== undefined) {
-            Error.encode(message.cause, writer.uint32(26).fork()).join();
-        }
-        return writer;
-    },
+  encode(message: Error, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.cause !== undefined) {
+      Error.encode(message.cause, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): Error {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseError();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  decode(input: BinaryReader | Uint8Array, length?: number): Error {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseError();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-                    message.name = reader.string();
-                    continue;
-                }
-                case 2: {
-                    if (tag !== 18) {
-                        break;
-                    }
-
-                    message.message = reader.string();
-                    continue;
-                }
-                case 3: {
-                    if (tag !== 26) {
-                        break;
-                    }
-
-                    message.cause = Error.decode(reader, reader.uint32());
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
+          message.name = reader.string();
+          continue;
         }
-        return message;
-    },
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-    fromJSON(object: any): Error {
-        return {
-            name: isSet(object.name) ? globalThis.String(object.name) : "",
-            message: isSet(object.message) ? globalThis.String(object.message) : "",
-            cause: isSet(object.cause) ? Error.fromJSON(object.cause) : undefined,
-        };
-    },
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-    toJSON(message: Error): unknown {
-        const obj: any = {};
-        if (message.name !== "") {
-            obj.name = message.name;
+          message.cause = Error.decode(reader, reader.uint32());
+          continue;
         }
-        if (message.message !== "") {
-            obj.message = message.message;
-        }
-        if (message.cause !== undefined) {
-            obj.cause = Error.toJSON(message.cause);
-        }
-        return obj;
-    },
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-    create(base?: DeepPartial<Error>): Error {
-        return Error.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<Error>): Error {
-        const message = createBaseError();
-        message.name = object.name ?? "";
-        message.message = object.message ?? "";
-        message.cause =
-            object.cause !== undefined && object.cause !== null ? Error.fromPartial(object.cause) : undefined;
-        return message;
-    },
+  fromJSON(object: any): Error {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      cause: isSet(object.cause) ? Error.fromJSON(object.cause) : undefined,
+    };
+  },
+
+  toJSON(message: Error): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.cause !== undefined) {
+      obj.cause = Error.toJSON(message.cause);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Error>): Error {
+    return Error.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Error>): Error {
+    const message = createBaseError();
+    message.name = object.name ?? "";
+    message.message = object.message ?? "";
+    message.cause = (object.cause !== undefined && object.cause !== null) ? Error.fromPartial(object.cause) : undefined;
+    return message;
+  },
 };
 
 function createBaseEvent(): Event {
-    return {
-        chatEvent: undefined,
-        whisperEvent: undefined,
-        actionBarEvent: undefined,
-        errorEvent: undefined,
-        messageEvent: undefined,
-    };
+  return {
+    chatEvent: undefined,
+    whisperEvent: undefined,
+    actionBarEvent: undefined,
+    errorEvent: undefined,
+    messageEvent: undefined,
+  };
 }
 
 export const Event: MessageFns<Event> = {
-    encode(message: Event, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.chatEvent !== undefined) {
-            ChatEvent.encode(message.chatEvent, writer.uint32(10).fork()).join();
-        }
-        if (message.whisperEvent !== undefined) {
-            WhisperEvent.encode(message.whisperEvent, writer.uint32(18).fork()).join();
-        }
-        if (message.actionBarEvent !== undefined) {
-            ActionBarEvent.encode(message.actionBarEvent, writer.uint32(26).fork()).join();
-        }
-        if (message.errorEvent !== undefined) {
-            ErrorEvent.encode(message.errorEvent, writer.uint32(34).fork()).join();
-        }
-        if (message.messageEvent !== undefined) {
-            MessageEvent.encode(message.messageEvent, writer.uint32(42).fork()).join();
-        }
-        return writer;
-    },
+  encode(message: Event, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.chatEvent !== undefined) {
+      ChatEvent.encode(message.chatEvent, writer.uint32(10).fork()).join();
+    }
+    if (message.whisperEvent !== undefined) {
+      WhisperEvent.encode(message.whisperEvent, writer.uint32(18).fork()).join();
+    }
+    if (message.actionBarEvent !== undefined) {
+      ActionBarEvent.encode(message.actionBarEvent, writer.uint32(26).fork()).join();
+    }
+    if (message.errorEvent !== undefined) {
+      ErrorEvent.encode(message.errorEvent, writer.uint32(34).fork()).join();
+    }
+    if (message.messageEvent !== undefined) {
+      MessageEvent.encode(message.messageEvent, writer.uint32(42).fork()).join();
+    }
+    return writer;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): Event {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseEvent();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  decode(input: BinaryReader | Uint8Array, length?: number): Event {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-                    message.chatEvent = ChatEvent.decode(reader, reader.uint32());
-                    continue;
-                }
-                case 2: {
-                    if (tag !== 18) {
-                        break;
-                    }
-
-                    message.whisperEvent = WhisperEvent.decode(reader, reader.uint32());
-                    continue;
-                }
-                case 3: {
-                    if (tag !== 26) {
-                        break;
-                    }
-
-                    message.actionBarEvent = ActionBarEvent.decode(reader, reader.uint32());
-                    continue;
-                }
-                case 4: {
-                    if (tag !== 34) {
-                        break;
-                    }
-
-                    message.errorEvent = ErrorEvent.decode(reader, reader.uint32());
-                    continue;
-                }
-                case 5: {
-                    if (tag !== 42) {
-                        break;
-                    }
-
-                    message.messageEvent = MessageEvent.decode(reader, reader.uint32());
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
+          message.chatEvent = ChatEvent.decode(reader, reader.uint32());
+          continue;
         }
-        return message;
-    },
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-    fromJSON(object: any): Event {
-        return {
-            chatEvent: isSet(object.chatEvent) ? ChatEvent.fromJSON(object.chatEvent) : undefined,
-            whisperEvent: isSet(object.whisperEvent) ? WhisperEvent.fromJSON(object.whisperEvent) : undefined,
-            actionBarEvent: isSet(object.actionBarEvent) ? ActionBarEvent.fromJSON(object.actionBarEvent) : undefined,
-            errorEvent: isSet(object.errorEvent) ? ErrorEvent.fromJSON(object.errorEvent) : undefined,
-            messageEvent: isSet(object.messageEvent) ? MessageEvent.fromJSON(object.messageEvent) : undefined,
-        };
-    },
+          message.whisperEvent = WhisperEvent.decode(reader, reader.uint32());
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-    toJSON(message: Event): unknown {
-        const obj: any = {};
-        if (message.chatEvent !== undefined) {
-            obj.chatEvent = ChatEvent.toJSON(message.chatEvent);
+          message.actionBarEvent = ActionBarEvent.decode(reader, reader.uint32());
+          continue;
         }
-        if (message.whisperEvent !== undefined) {
-            obj.whisperEvent = WhisperEvent.toJSON(message.whisperEvent);
-        }
-        if (message.actionBarEvent !== undefined) {
-            obj.actionBarEvent = ActionBarEvent.toJSON(message.actionBarEvent);
-        }
-        if (message.errorEvent !== undefined) {
-            obj.errorEvent = ErrorEvent.toJSON(message.errorEvent);
-        }
-        if (message.messageEvent !== undefined) {
-            obj.messageEvent = MessageEvent.toJSON(message.messageEvent);
-        }
-        return obj;
-    },
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-    create(base?: DeepPartial<Event>): Event {
-        return Event.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<Event>): Event {
-        const message = createBaseEvent();
-        message.chatEvent =
-            object.chatEvent !== undefined && object.chatEvent !== null
-                ? ChatEvent.fromPartial(object.chatEvent)
-                : undefined;
-        message.whisperEvent =
-            object.whisperEvent !== undefined && object.whisperEvent !== null
-                ? WhisperEvent.fromPartial(object.whisperEvent)
-                : undefined;
-        message.actionBarEvent =
-            object.actionBarEvent !== undefined && object.actionBarEvent !== null
-                ? ActionBarEvent.fromPartial(object.actionBarEvent)
-                : undefined;
-        message.errorEvent =
-            object.errorEvent !== undefined && object.errorEvent !== null
-                ? ErrorEvent.fromPartial(object.errorEvent)
-                : undefined;
-        message.messageEvent =
-            object.messageEvent !== undefined && object.messageEvent !== null
-                ? MessageEvent.fromPartial(object.messageEvent)
-                : undefined;
-        return message;
-    },
+          message.errorEvent = ErrorEvent.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.messageEvent = MessageEvent.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Event {
+    return {
+      chatEvent: isSet(object.chatEvent) ? ChatEvent.fromJSON(object.chatEvent) : undefined,
+      whisperEvent: isSet(object.whisperEvent) ? WhisperEvent.fromJSON(object.whisperEvent) : undefined,
+      actionBarEvent: isSet(object.actionBarEvent) ? ActionBarEvent.fromJSON(object.actionBarEvent) : undefined,
+      errorEvent: isSet(object.errorEvent) ? ErrorEvent.fromJSON(object.errorEvent) : undefined,
+      messageEvent: isSet(object.messageEvent) ? MessageEvent.fromJSON(object.messageEvent) : undefined,
+    };
+  },
+
+  toJSON(message: Event): unknown {
+    const obj: any = {};
+    if (message.chatEvent !== undefined) {
+      obj.chatEvent = ChatEvent.toJSON(message.chatEvent);
+    }
+    if (message.whisperEvent !== undefined) {
+      obj.whisperEvent = WhisperEvent.toJSON(message.whisperEvent);
+    }
+    if (message.actionBarEvent !== undefined) {
+      obj.actionBarEvent = ActionBarEvent.toJSON(message.actionBarEvent);
+    }
+    if (message.errorEvent !== undefined) {
+      obj.errorEvent = ErrorEvent.toJSON(message.errorEvent);
+    }
+    if (message.messageEvent !== undefined) {
+      obj.messageEvent = MessageEvent.toJSON(message.messageEvent);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Event>): Event {
+    return Event.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Event>): Event {
+    const message = createBaseEvent();
+    message.chatEvent = (object.chatEvent !== undefined && object.chatEvent !== null)
+      ? ChatEvent.fromPartial(object.chatEvent)
+      : undefined;
+    message.whisperEvent = (object.whisperEvent !== undefined && object.whisperEvent !== null)
+      ? WhisperEvent.fromPartial(object.whisperEvent)
+      : undefined;
+    message.actionBarEvent = (object.actionBarEvent !== undefined && object.actionBarEvent !== null)
+      ? ActionBarEvent.fromPartial(object.actionBarEvent)
+      : undefined;
+    message.errorEvent = (object.errorEvent !== undefined && object.errorEvent !== null)
+      ? ErrorEvent.fromPartial(object.errorEvent)
+      : undefined;
+    message.messageEvent = (object.messageEvent !== undefined && object.messageEvent !== null)
+      ? MessageEvent.fromPartial(object.messageEvent)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseChatEvent(): ChatEvent {
-    return { username: "", message: "", translate: undefined, jsonMsg: undefined, matches: [] };
+  return { username: "", message: "", translate: undefined, jsonMsg: undefined, matches: [] };
 }
 
 export const ChatEvent: MessageFns<ChatEvent> = {
-    encode(message: ChatEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.username !== "") {
-            writer.uint32(10).string(message.username);
-        }
-        if (message.message !== "") {
-            writer.uint32(18).string(message.message);
-        }
-        if (message.translate !== undefined) {
-            writer.uint32(26).string(message.translate);
-        }
-        if (message.jsonMsg !== undefined) {
-            ChatMessage.encode(message.jsonMsg, writer.uint32(34).fork()).join();
-        }
-        for (const v of message.matches) {
-            writer.uint32(42).string(v!);
-        }
-        return writer;
-    },
+  encode(message: ChatEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.username !== "") {
+      writer.uint32(10).string(message.username);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.translate !== undefined) {
+      writer.uint32(26).string(message.translate);
+    }
+    if (message.jsonMsg !== undefined) {
+      ChatMessage.encode(message.jsonMsg, writer.uint32(34).fork()).join();
+    }
+    for (const v of message.matches) {
+      writer.uint32(42).string(v!);
+    }
+    return writer;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): ChatEvent {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseChatEvent();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  decode(input: BinaryReader | Uint8Array, length?: number): ChatEvent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChatEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-                    message.username = reader.string();
-                    continue;
-                }
-                case 2: {
-                    if (tag !== 18) {
-                        break;
-                    }
-
-                    message.message = reader.string();
-                    continue;
-                }
-                case 3: {
-                    if (tag !== 26) {
-                        break;
-                    }
-
-                    message.translate = reader.string();
-                    continue;
-                }
-                case 4: {
-                    if (tag !== 34) {
-                        break;
-                    }
-
-                    message.jsonMsg = ChatMessage.decode(reader, reader.uint32());
-                    continue;
-                }
-                case 5: {
-                    if (tag !== 42) {
-                        break;
-                    }
-
-                    message.matches.push(reader.string());
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
+          message.username = reader.string();
+          continue;
         }
-        return message;
-    },
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-    fromJSON(object: any): ChatEvent {
-        return {
-            username: isSet(object.username) ? globalThis.String(object.username) : "",
-            message: isSet(object.message) ? globalThis.String(object.message) : "",
-            translate: isSet(object.translate) ? globalThis.String(object.translate) : undefined,
-            jsonMsg: isSet(object.jsonMsg) ? ChatMessage.fromJSON(object.jsonMsg) : undefined,
-            matches: globalThis.Array.isArray(object?.matches)
-                ? object.matches.map((e: any) => globalThis.String(e))
-                : [],
-        };
-    },
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-    toJSON(message: ChatEvent): unknown {
-        const obj: any = {};
-        if (message.username !== "") {
-            obj.username = message.username;
+          message.translate = reader.string();
+          continue;
         }
-        if (message.message !== "") {
-            obj.message = message.message;
-        }
-        if (message.translate !== undefined) {
-            obj.translate = message.translate;
-        }
-        if (message.jsonMsg !== undefined) {
-            obj.jsonMsg = ChatMessage.toJSON(message.jsonMsg);
-        }
-        if (message.matches?.length) {
-            obj.matches = message.matches;
-        }
-        return obj;
-    },
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-    create(base?: DeepPartial<ChatEvent>): ChatEvent {
-        return ChatEvent.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<ChatEvent>): ChatEvent {
-        const message = createBaseChatEvent();
-        message.username = object.username ?? "";
-        message.message = object.message ?? "";
-        message.translate = object.translate ?? undefined;
-        message.jsonMsg =
-            object.jsonMsg !== undefined && object.jsonMsg !== null
-                ? ChatMessage.fromPartial(object.jsonMsg)
-                : undefined;
-        message.matches = object.matches?.map((e) => e) || [];
-        return message;
-    },
+          message.jsonMsg = ChatMessage.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.matches.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ChatEvent {
+    return {
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      translate: isSet(object.translate) ? globalThis.String(object.translate) : undefined,
+      jsonMsg: isSet(object.jsonMsg) ? ChatMessage.fromJSON(object.jsonMsg) : undefined,
+      matches: globalThis.Array.isArray(object?.matches) ? object.matches.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
+
+  toJSON(message: ChatEvent): unknown {
+    const obj: any = {};
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.translate !== undefined) {
+      obj.translate = message.translate;
+    }
+    if (message.jsonMsg !== undefined) {
+      obj.jsonMsg = ChatMessage.toJSON(message.jsonMsg);
+    }
+    if (message.matches?.length) {
+      obj.matches = message.matches;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ChatEvent>): ChatEvent {
+    return ChatEvent.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChatEvent>): ChatEvent {
+    const message = createBaseChatEvent();
+    message.username = object.username ?? "";
+    message.message = object.message ?? "";
+    message.translate = object.translate ?? undefined;
+    message.jsonMsg = (object.jsonMsg !== undefined && object.jsonMsg !== null)
+      ? ChatMessage.fromPartial(object.jsonMsg)
+      : undefined;
+    message.matches = object.matches?.map((e) => e) || [];
+    return message;
+  },
 };
 
 function createBaseWhisperEvent(): WhisperEvent {
-    return { username: "", message: "", translate: undefined, jsonMsg: undefined, matches: [] };
+  return { username: "", message: "", translate: undefined, jsonMsg: undefined, matches: [] };
 }
 
 export const WhisperEvent: MessageFns<WhisperEvent> = {
-    encode(message: WhisperEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.username !== "") {
-            writer.uint32(10).string(message.username);
-        }
-        if (message.message !== "") {
-            writer.uint32(18).string(message.message);
-        }
-        if (message.translate !== undefined) {
-            writer.uint32(26).string(message.translate);
-        }
-        if (message.jsonMsg !== undefined) {
-            ChatMessage.encode(message.jsonMsg, writer.uint32(34).fork()).join();
-        }
-        for (const v of message.matches) {
-            writer.uint32(42).string(v!);
-        }
-        return writer;
-    },
+  encode(message: WhisperEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.username !== "") {
+      writer.uint32(10).string(message.username);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.translate !== undefined) {
+      writer.uint32(26).string(message.translate);
+    }
+    if (message.jsonMsg !== undefined) {
+      ChatMessage.encode(message.jsonMsg, writer.uint32(34).fork()).join();
+    }
+    for (const v of message.matches) {
+      writer.uint32(42).string(v!);
+    }
+    return writer;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): WhisperEvent {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseWhisperEvent();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  decode(input: BinaryReader | Uint8Array, length?: number): WhisperEvent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWhisperEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-                    message.username = reader.string();
-                    continue;
-                }
-                case 2: {
-                    if (tag !== 18) {
-                        break;
-                    }
-
-                    message.message = reader.string();
-                    continue;
-                }
-                case 3: {
-                    if (tag !== 26) {
-                        break;
-                    }
-
-                    message.translate = reader.string();
-                    continue;
-                }
-                case 4: {
-                    if (tag !== 34) {
-                        break;
-                    }
-
-                    message.jsonMsg = ChatMessage.decode(reader, reader.uint32());
-                    continue;
-                }
-                case 5: {
-                    if (tag !== 42) {
-                        break;
-                    }
-
-                    message.matches.push(reader.string());
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
+          message.username = reader.string();
+          continue;
         }
-        return message;
-    },
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-    fromJSON(object: any): WhisperEvent {
-        return {
-            username: isSet(object.username) ? globalThis.String(object.username) : "",
-            message: isSet(object.message) ? globalThis.String(object.message) : "",
-            translate: isSet(object.translate) ? globalThis.String(object.translate) : undefined,
-            jsonMsg: isSet(object.jsonMsg) ? ChatMessage.fromJSON(object.jsonMsg) : undefined,
-            matches: globalThis.Array.isArray(object?.matches)
-                ? object.matches.map((e: any) => globalThis.String(e))
-                : [],
-        };
-    },
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
 
-    toJSON(message: WhisperEvent): unknown {
-        const obj: any = {};
-        if (message.username !== "") {
-            obj.username = message.username;
+          message.translate = reader.string();
+          continue;
         }
-        if (message.message !== "") {
-            obj.message = message.message;
-        }
-        if (message.translate !== undefined) {
-            obj.translate = message.translate;
-        }
-        if (message.jsonMsg !== undefined) {
-            obj.jsonMsg = ChatMessage.toJSON(message.jsonMsg);
-        }
-        if (message.matches?.length) {
-            obj.matches = message.matches;
-        }
-        return obj;
-    },
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
 
-    create(base?: DeepPartial<WhisperEvent>): WhisperEvent {
-        return WhisperEvent.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<WhisperEvent>): WhisperEvent {
-        const message = createBaseWhisperEvent();
-        message.username = object.username ?? "";
-        message.message = object.message ?? "";
-        message.translate = object.translate ?? undefined;
-        message.jsonMsg =
-            object.jsonMsg !== undefined && object.jsonMsg !== null
-                ? ChatMessage.fromPartial(object.jsonMsg)
-                : undefined;
-        message.matches = object.matches?.map((e) => e) || [];
-        return message;
-    },
+          message.jsonMsg = ChatMessage.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.matches.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): WhisperEvent {
+    return {
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      translate: isSet(object.translate) ? globalThis.String(object.translate) : undefined,
+      jsonMsg: isSet(object.jsonMsg) ? ChatMessage.fromJSON(object.jsonMsg) : undefined,
+      matches: globalThis.Array.isArray(object?.matches) ? object.matches.map((e: any) => globalThis.String(e)) : [],
+    };
+  },
+
+  toJSON(message: WhisperEvent): unknown {
+    const obj: any = {};
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.translate !== undefined) {
+      obj.translate = message.translate;
+    }
+    if (message.jsonMsg !== undefined) {
+      obj.jsonMsg = ChatMessage.toJSON(message.jsonMsg);
+    }
+    if (message.matches?.length) {
+      obj.matches = message.matches;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<WhisperEvent>): WhisperEvent {
+    return WhisperEvent.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<WhisperEvent>): WhisperEvent {
+    const message = createBaseWhisperEvent();
+    message.username = object.username ?? "";
+    message.message = object.message ?? "";
+    message.translate = object.translate ?? undefined;
+    message.jsonMsg = (object.jsonMsg !== undefined && object.jsonMsg !== null)
+      ? ChatMessage.fromPartial(object.jsonMsg)
+      : undefined;
+    message.matches = object.matches?.map((e) => e) || [];
+    return message;
+  },
 };
 
 function createBaseActionBarEvent(): ActionBarEvent {
-    return { jsonMsg: undefined };
+  return { jsonMsg: undefined };
 }
 
 export const ActionBarEvent: MessageFns<ActionBarEvent> = {
-    encode(message: ActionBarEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.jsonMsg !== undefined) {
-            ChatMessage.encode(message.jsonMsg, writer.uint32(10).fork()).join();
+  encode(message: ActionBarEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.jsonMsg !== undefined) {
+      ChatMessage.encode(message.jsonMsg, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ActionBarEvent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseActionBarEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.jsonMsg = ChatMessage.decode(reader, reader.uint32());
+          continue;
         }
-        return writer;
-    },
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): ActionBarEvent {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseActionBarEvent();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  fromJSON(object: any): ActionBarEvent {
+    return { jsonMsg: isSet(object.jsonMsg) ? ChatMessage.fromJSON(object.jsonMsg) : undefined };
+  },
 
-                    message.jsonMsg = ChatMessage.decode(reader, reader.uint32());
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
-        }
-        return message;
-    },
+  toJSON(message: ActionBarEvent): unknown {
+    const obj: any = {};
+    if (message.jsonMsg !== undefined) {
+      obj.jsonMsg = ChatMessage.toJSON(message.jsonMsg);
+    }
+    return obj;
+  },
 
-    fromJSON(object: any): ActionBarEvent {
-        return { jsonMsg: isSet(object.jsonMsg) ? ChatMessage.fromJSON(object.jsonMsg) : undefined };
-    },
-
-    toJSON(message: ActionBarEvent): unknown {
-        const obj: any = {};
-        if (message.jsonMsg !== undefined) {
-            obj.jsonMsg = ChatMessage.toJSON(message.jsonMsg);
-        }
-        return obj;
-    },
-
-    create(base?: DeepPartial<ActionBarEvent>): ActionBarEvent {
-        return ActionBarEvent.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<ActionBarEvent>): ActionBarEvent {
-        const message = createBaseActionBarEvent();
-        message.jsonMsg =
-            object.jsonMsg !== undefined && object.jsonMsg !== null
-                ? ChatMessage.fromPartial(object.jsonMsg)
-                : undefined;
-        return message;
-    },
+  create(base?: DeepPartial<ActionBarEvent>): ActionBarEvent {
+    return ActionBarEvent.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ActionBarEvent>): ActionBarEvent {
+    const message = createBaseActionBarEvent();
+    message.jsonMsg = (object.jsonMsg !== undefined && object.jsonMsg !== null)
+      ? ChatMessage.fromPartial(object.jsonMsg)
+      : undefined;
+    return message;
+  },
 };
 
 function createBaseErrorEvent(): ErrorEvent {
-    return { err: undefined };
+  return { err: undefined };
 }
 
 export const ErrorEvent: MessageFns<ErrorEvent> = {
-    encode(message: ErrorEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.err !== undefined) {
-            Error.encode(message.err, writer.uint32(10).fork()).join();
+  encode(message: ErrorEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.err !== undefined) {
+      Error.encode(message.err, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ErrorEvent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseErrorEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.err = Error.decode(reader, reader.uint32());
+          continue;
         }
-        return writer;
-    },
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): ErrorEvent {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseErrorEvent();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  fromJSON(object: any): ErrorEvent {
+    return { err: isSet(object.err) ? Error.fromJSON(object.err) : undefined };
+  },
 
-                    message.err = Error.decode(reader, reader.uint32());
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
-        }
-        return message;
-    },
+  toJSON(message: ErrorEvent): unknown {
+    const obj: any = {};
+    if (message.err !== undefined) {
+      obj.err = Error.toJSON(message.err);
+    }
+    return obj;
+  },
 
-    fromJSON(object: any): ErrorEvent {
-        return { err: isSet(object.err) ? Error.fromJSON(object.err) : undefined };
-    },
-
-    toJSON(message: ErrorEvent): unknown {
-        const obj: any = {};
-        if (message.err !== undefined) {
-            obj.err = Error.toJSON(message.err);
-        }
-        return obj;
-    },
-
-    create(base?: DeepPartial<ErrorEvent>): ErrorEvent {
-        return ErrorEvent.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<ErrorEvent>): ErrorEvent {
-        const message = createBaseErrorEvent();
-        message.err = object.err !== undefined && object.err !== null ? Error.fromPartial(object.err) : undefined;
-        return message;
-    },
+  create(base?: DeepPartial<ErrorEvent>): ErrorEvent {
+    return ErrorEvent.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ErrorEvent>): ErrorEvent {
+    const message = createBaseErrorEvent();
+    message.err = (object.err !== undefined && object.err !== null) ? Error.fromPartial(object.err) : undefined;
+    return message;
+  },
 };
 
 function createBaseMessageEvent(): MessageEvent {
-    return { message: undefined, position: "" };
+  return { message: undefined, position: "" };
 }
 
 export const MessageEvent: MessageFns<MessageEvent> = {
-    encode(message: MessageEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-        if (message.message !== undefined) {
-            ChatMessage.encode(message.message, writer.uint32(10).fork()).join();
+  encode(message: MessageEvent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== undefined) {
+      ChatMessage.encode(message.message, writer.uint32(10).fork()).join();
+    }
+    if (message.position !== "") {
+      writer.uint32(18).string(message.position);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): MessageEvent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMessageEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.message = ChatMessage.decode(reader, reader.uint32());
+          continue;
         }
-        if (message.position !== "") {
-            writer.uint32(18).string(message.position);
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.position = reader.string();
+          continue;
         }
-        return writer;
-    },
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-    decode(input: BinaryReader | Uint8Array, length?: number): MessageEvent {
-        const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-        const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseMessageEvent();
-        while (reader.pos < end) {
-            const tag = reader.uint32();
-            switch (tag >>> 3) {
-                case 1: {
-                    if (tag !== 10) {
-                        break;
-                    }
+  fromJSON(object: any): MessageEvent {
+    return {
+      message: isSet(object.message) ? ChatMessage.fromJSON(object.message) : undefined,
+      position: isSet(object.position) ? globalThis.String(object.position) : "",
+    };
+  },
 
-                    message.message = ChatMessage.decode(reader, reader.uint32());
-                    continue;
-                }
-                case 2: {
-                    if (tag !== 18) {
-                        break;
-                    }
+  toJSON(message: MessageEvent): unknown {
+    const obj: any = {};
+    if (message.message !== undefined) {
+      obj.message = ChatMessage.toJSON(message.message);
+    }
+    if (message.position !== "") {
+      obj.position = message.position;
+    }
+    return obj;
+  },
 
-                    message.position = reader.string();
-                    continue;
-                }
-            }
-            if ((tag & 7) === 4 || tag === 0) {
-                break;
-            }
-            reader.skip(tag & 7);
-        }
-        return message;
-    },
-
-    fromJSON(object: any): MessageEvent {
-        return {
-            message: isSet(object.message) ? ChatMessage.fromJSON(object.message) : undefined,
-            position: isSet(object.position) ? globalThis.String(object.position) : "",
-        };
-    },
-
-    toJSON(message: MessageEvent): unknown {
-        const obj: any = {};
-        if (message.message !== undefined) {
-            obj.message = ChatMessage.toJSON(message.message);
-        }
-        if (message.position !== "") {
-            obj.position = message.position;
-        }
-        return obj;
-    },
-
-    create(base?: DeepPartial<MessageEvent>): MessageEvent {
-        return MessageEvent.fromPartial(base ?? {});
-    },
-    fromPartial(object: DeepPartial<MessageEvent>): MessageEvent {
-        const message = createBaseMessageEvent();
-        message.message =
-            object.message !== undefined && object.message !== null
-                ? ChatMessage.fromPartial(object.message)
-                : undefined;
-        message.position = object.position ?? "";
-        return message;
-    },
+  create(base?: DeepPartial<MessageEvent>): MessageEvent {
+    return MessageEvent.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MessageEvent>): MessageEvent {
+    const message = createBaseMessageEvent();
+    message.message = (object.message !== undefined && object.message !== null)
+      ? ChatMessage.fromPartial(object.message)
+      : undefined;
+    message.position = object.position ?? "";
+    return message;
+  },
 };
 
 export type AcceptorDefinition = typeof AcceptorDefinition;
 export const AcceptorDefinition = {
-    name: "Acceptor",
-    fullName: "Acceptor",
-    methods: {
-        ready: {
-            name: "Ready",
-            requestType: ReadyRequest,
-            requestStream: false,
-            responseType: Empty,
-            responseStream: false,
-            options: {},
-        },
+  name: "Acceptor",
+  fullName: "Acceptor",
+  methods: {
+    ready: {
+      name: "Ready",
+      requestType: ReadyRequest,
+      requestStream: false,
+      responseType: Empty,
+      responseStream: false,
+      options: {},
     },
+  },
 } as const;
 
 export interface AcceptorServiceImplementation<CallContextExt = {}> {
-    ready(request: ReadyRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
+  ready(request: ReadyRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
 }
 
 export interface AcceptorClient<CallOptionsExt = {}> {
-    ready(request: DeepPartial<ReadyRequest>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
+  ready(request: DeepPartial<ReadyRequest>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
 }
 
 export type BotDefinition = typeof BotDefinition;
 export const BotDefinition = {
-    name: "Bot",
-    fullName: "Bot",
-    methods: {
-        streamEvents: {
-            name: "StreamEvents",
-            requestType: Empty,
-            requestStream: false,
-            responseType: Event,
-            responseStream: true,
-            options: {},
-        },
-        ping: {
-            name: "Ping",
-            requestType: Empty,
-            requestStream: false,
-            responseType: PingResponse,
-            responseStream: false,
-            options: {},
-        },
+  name: "Bot",
+  fullName: "Bot",
+  methods: {
+    ping: {
+      name: "Ping",
+      requestType: Empty,
+      requestStream: false,
+      responseType: PingResponse,
+      responseStream: false,
+      options: {},
     },
+    streamEvents: {
+      name: "StreamEvents",
+      requestType: Empty,
+      requestStream: false,
+      responseType: Event,
+      responseStream: true,
+      options: {},
+    },
+    connect: {
+      name: "Connect",
+      requestType: ConnectRequest,
+      requestStream: false,
+      responseType: Empty,
+      responseStream: false,
+      options: {},
+    },
+  },
 } as const;
 
 export interface BotServiceImplementation<CallContextExt = {}> {
-    streamEvents(
-        request: Empty,
-        context: CallContext & CallContextExt,
-    ): ServerStreamingMethodResult<DeepPartial<Event>>;
-    ping(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<PingResponse>>;
+  ping(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<PingResponse>>;
+  streamEvents(request: Empty, context: CallContext & CallContextExt): ServerStreamingMethodResult<DeepPartial<Event>>;
+  connect(request: ConnectRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Empty>>;
 }
 
 export interface BotClient<CallOptionsExt = {}> {
-    streamEvents(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): AsyncIterable<Event>;
-    ping(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<PingResponse>;
+  ping(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<PingResponse>;
+  streamEvents(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): AsyncIterable<Event>;
+  connect(request: DeepPartial<ConnectRequest>, options?: CallOptions & CallOptionsExt): Promise<Empty>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-    ? T
-    : T extends globalThis.Array<infer U>
-      ? globalThis.Array<DeepPartial<U>>
-      : T extends ReadonlyArray<infer U>
-        ? ReadonlyArray<DeepPartial<U>>
-        : T extends {}
-          ? { [K in keyof T]?: DeepPartial<T[K]> }
-          : Partial<T>;
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 function isSet(value: any): boolean {
-    return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 export type ServerStreamingMethodResult<Response> = { [Symbol.asyncIterator](): AsyncIterator<Response, void> };
 
 export interface MessageFns<T> {
-    encode(message: T, writer?: BinaryWriter): BinaryWriter;
-    decode(input: BinaryReader | Uint8Array, length?: number): T;
-    fromJSON(object: any): T;
-    toJSON(message: T): unknown;
-    create(base?: DeepPartial<T>): T;
-    fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }
