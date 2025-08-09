@@ -14,7 +14,7 @@ async function main() {
         grpcPort: process.env.GRPC_PORT!,
     };
 
-    const rpc = new Rpc();
+    const rpc = new Rpc(config);
 
     const server = createServer();
     server.add(BotDefinition, rpc);
@@ -32,10 +32,6 @@ async function main() {
         port: port,
     });
     log.info("Sent Ready request");
-
-    setInterval(() => {
-        log.info("bump");
-    }, 10000);
 }
 
 await main();
