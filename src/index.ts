@@ -1,6 +1,6 @@
 import pino from "pino";
 import { createChannel, createClient, createServer } from "nice-grpc";
-import { BotDefinition, ReadyRequest, type AcceptorClient, AcceptorDefinition } from "./pb/bot.ts";
+import { BotDefinition, type AcceptorClient, AcceptorDefinition } from "./pb/bot.ts";
 import { Rpc } from "./rpc.ts";
 
 async function main() {
@@ -10,12 +10,6 @@ async function main() {
 
     const config = {
         botId: process.env.BOT_ID!,
-        botHost: process.env.BOT_HOST!,
-        botPort: process.env.BOT_PORT!,
-        botUsername: process.env.BOT_USERNAME!,
-        botAuth: process.env.BOT_AUTH!,
-        botToken: process.env.BOT_TOKEN,
-
         grpcHost: process.env.GRPC_HOST!,
         grpcPort: process.env.GRPC_PORT!,
     };
