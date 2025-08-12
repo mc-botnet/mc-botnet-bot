@@ -25,13 +25,15 @@ export class Rpc implements ServiceImplementation<BotDefinition> {
         this.log = log;
     }
 
-    ping = wrap(
-        async (_request: Empty, _context: CallContext): Promise<DeepPartial<PingResponse>> => ({ payload: "Pong!" }),
-    );
+    @wrap
+    async ping(_request: Empty, _context: CallContext): Promise<DeepPartial<PingResponse>> {
+        return { payload: "Pong!" };
+    }
 
     async *streamEvents(_request: Empty, _context: CallContext): AsyncIterable<DeepPartial<Event>> {}
 
-    connect = wrap(async (request: ConnectRequest, _context: CallContext): Promise<Empty> => {
+    @wrap
+    async connect(request: ConnectRequest, _context: CallContext): Promise<Empty> {
         this.bot = createBot({
             host: request.host,
             port: request.port,
@@ -41,7 +43,7 @@ export class Rpc implements ServiceImplementation<BotDefinition> {
         });
 
         return {};
-    });
+    }
 
     close() {
         this.log.info("Closing");
