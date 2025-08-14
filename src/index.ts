@@ -31,8 +31,12 @@ async function main() {
     log.info("Sent Ready request");
 
     await waitForSignal();
-    log.info("Shutting down");
     rpc.close();
+    server.forceShutdown();
+    channel.close();
+
+    log.info("Shutting down");
+    process.exit(0);
 }
 
 function waitForSignal(): Promise<void> {
